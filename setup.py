@@ -7,6 +7,8 @@ with open('README.rst', 'r') as fh:
 setup(name='py_health_checker',
       version='0.1.0',
       author='w00fmeow',
+      license = "BSD",
+      keywords = "cli tool check up time health check web server",
       description='CLI tool to monitor uptime of a web server',
       long_description=long_description,
       packages=find_packages(exclude=('tests',)),
