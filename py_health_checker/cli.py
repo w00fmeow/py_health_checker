@@ -11,7 +11,7 @@ parser.add_argument("-e", "--every", help='Run health checks every x time. Examp
 
 args = parser.parse_args()
 
-async def main(loop=None):
+async def launch(loop=None):
     config = parse_config(path=args.config)
     interval_sec = parse_time_interval(args.every)
 

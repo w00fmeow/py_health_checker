@@ -8,7 +8,7 @@ Usage
 
 ::
 
-    python -m py_health_checker -e="15 sec"
+    python3 -m py_health_checker --every="15 sec"
     
     
 Arguments
