@@ -3,6 +3,7 @@ import aiohttp, functools
 from .constants import GLOBAL_TIMEOUT_SEC, DEFAULT_HTTP_METHOD, RECHECK_TARGET_BEFORE_NOTIFY
 from .enums import HTTPMethod
 from .queue import targets_to_notify
+from datetime import datetime
 from . import logger
 from .db import db
 
@@ -19,6 +20,7 @@ def notify_on_fail(func):
 
             for _ in range(RECHECK_TARGET_BEFORE_NOTIFY):
                 up = await func(*args, **kwargs)
+                
                 if up:
                     return
 
@@ -35,6 +37,8 @@ def notify_on_fail(func):
         if should_issue_notification:
             logger.info(f"Issuing notifications for target {kwargs['id']}")
             targets_to_notify.put_nowait(target)
+            db.update_target(notified=int(datetime.now().timestamp()), id=kwargs["id"])
+
 
         return up
     return wrap
@@ -45,9 +49,10 @@ async def http(path=None, method=None, cookie=None, headers=None, checker=None, 
     headers = None
     cookies = None
     method = HTTPMethod.GET if method == HTTPMethod.GET.value else DEFAULT_HTTP_METHOD
+    timeout = aiohttp.ClientTimeout(total=GLOBAL_TIMEOUT_SEC)
     session = None
+    
     try:
-        timeout = aiohttp.ClientTimeout(total=GLOBAL_TIMEOUT_SEC)
         session = aiohttp.ClientSession(timeout=timeout, headers=headers, cookies=cookies)
         response = await getattr(session, method.value.lower())(path)
        
@@ -59,10 +64,10 @@ async def http(path=None, method=None, cookie=None, headers=None, checker=None, 
         await session.close()
         return True
     except Exception as e:
-        if session:
+        logger.error(f"http checker error: {e}")
+        if session and not session.closed:
             await session.close()
 
-        logger.error(f"http checker error: {e}")
         return False
 
 

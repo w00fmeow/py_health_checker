@@ -51,7 +51,7 @@ class DB():
         target = self.get_target(id)
         
         if up is not None:
-            if not target["up"] == up:
+            if target["up"] != up:
                 self._data['targets'][id]["up"] = up
                 self._data['targets'][id]["last_notified"] = False
                 logger.log(f"target status changed: {id}. Previous status {target['up']} new status : {up}")

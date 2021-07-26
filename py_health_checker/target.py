@@ -45,7 +45,8 @@ async def run_notification_worker():
                 coro = channel_to_method[channel["type"]](channel, message, target)
 
                 asyncio.ensure_future(coro)
-
+            
+            targets_to_notify.task_done()
 
         except Exception as e:
             logger.error(f"run_notification_worker error : {e}")
