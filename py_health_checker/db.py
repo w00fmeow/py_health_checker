@@ -8,8 +8,9 @@ def save_db(func):
     @functools.wraps(func)
     def wrap(self, *args, **kwargs):
         try:
-            func(self, *args, **kwargs)
+            result = func(self, *args, **kwargs)
             asyncio.ensure_future(self._save_db())
+            return result
         except Exception as e:
             logger.error(f'save_db error: {e}')
     return wrap
